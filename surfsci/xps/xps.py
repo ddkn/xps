@@ -100,6 +100,85 @@ found using an external program QUASES-IMFP-TPP2M.
     return (matrix_alpha*beta)/(matrix_beta*alpha)
 
 
+class XPSPeak():
+    """XPSPeakBase class that conveniently wraps the base functions into an object
+    """
+    def __init__(self, be, peak_area, sf_elem, hv, pe, a, scale, alpha=1,
+            beta=1, matrix_alpha=1, matrix_beta=1, *args, **kws):
+        self.__be = be
+        self.__pk = pk
+        self.__sf_elem = sf_elem
+        self.__hv = hv
+        self.__pe = pe
+        self.__a = a
+        self.__scale = scale
+        self.__alpha = alpha
+        self.__beta = beta
+        self.__matrix_alpha = matrix_alpha
+        self.__matrix_beta = matrix_beta
+        self.__args = args
+        self.__kws = kws
+
+    def get_kinetic_energy(self):
+        return kinetic_energy(self.__be, self.__hv, self.__psi)
+
+    def get_transmission(self):
+        return transmission(self.__ke, self.__pe, self.__a, self.__scale)
+
+    def get_sf_machine(self):
+        ke = self.get_kinetic_energy()
+        transmission_wagner = 1/ke # proportional to 1/KE
+        if 'transmission_wagner' in kws:
+            self.transmission_wagner = kws['transmission_wagner']
+
+        tx_xps = self.get_transmission()
+
+        return sf_machine(self.__sf_elem, tx_xps, transmission_wagner)
+
+    def get_matrix_factor(self):
+        return matrix_factor(self.__alpha, self.__beta, self.__matrix_alpha,
+                             self.__matrix_beta)
+
+    def get_peak_correction(self):
+        ke = self.get_kinetic_energy()
+        tx = self.get_transmission()
+        sf_mach = self.get_sf_machine()
+
+        return peak_correction(self.__peak_area, sf_mach)
+
+    def get_mach_params(self):
+        params = {
+            'photon_energy' : self.__hv,
+            'pass_energy'   : self.__pe,
+            'coefficients'  : self.__a,
+            'scale'         : self.__scale,
+        }
+
+        return params
+
+    def get_all(self, array_true=False):
+        data_dict = {
+            'binding_energy'    : self.__be,
+            'kinetic_energy'    : self.get_kinetic_energy(),
+            'transmission_func' : self.get_transmission(),
+            'sf_machine'        : self.get_sf_machine(),
+            'matrix_factor'     : self.get_matrix_factor(),
+            'peak_corrected'    : self.get_peak_correction(),
+        }
+
+        if array_true == True:
+            header = []
+            values = []
+            for k, v in data_dict.iter():
+                header.append(k)
+                values.append(v)
+            format = ['f8' for i in range(len(values))]
+            data_arr = np.rec.fromrecords(values, header, format)
+
+            return data_arr
+        return data_dict
+
+
 if __name__ == '__main__':
     pass
 
