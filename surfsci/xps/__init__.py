@@ -4,6 +4,7 @@ __author_email__ = "david@david.science"
 
 try:
     from .xps import *
+    from . import parser
 
 except ImportError as err:
     print(err)
