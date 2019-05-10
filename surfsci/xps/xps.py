@@ -25,14 +25,15 @@ __license__ = 'ISC License'
 __status__  = 'Development'
 
 from numpy import log10, poly1d
+from pandas import DataFrame
 
-PHOTON_ENERGY = {
+photon_energy = {
     'Mg' : 1253.6, # eV
 }
 
-MACH_PARAM = {
+mach_param = {
     'Dalhousie': {
-        'coefficients' : [0.9033, -4.0724, 5.0677, 1.1066],
+        'coef' : [0.9033, -4.0724, 5.0677, 1.1066],
         'scale'        : 0.01,
         'work_func'    : 4.6,
     }
@@ -103,14 +104,17 @@ found using an external program QUASES-IMFP-TPP2M.
 class XPSPeak():
     """XPSPeakBase class that conveniently wraps the base functions into an object
     """
-    def __init__(self, be, peak_area, sf_elem, hv, pe, a, scale, alpha=1,
-            beta=1, matrix_alpha=1, matrix_beta=1, *args, **kws):
+    def __init__(self, peak_id, be, peak_area, sf_elem, hv, pe, a, work_func,
+            scale, alpha=1, beta=1, matrix_alpha=1, matrix_beta=1,
+            *args, **kws):
+        self.__peak_id = peak_id
         self.__be = be
-        self.__pk = pk
+        self.__peak_area = peak_area
         self.__sf_elem = sf_elem
         self.__hv = hv
         self.__pe = pe
         self.__a = a
+        self.__psi = work_func
         self.__scale = scale
         self.__alpha = alpha
         self.__beta = beta
@@ -123,13 +127,15 @@ class XPSPeak():
         return kinetic_energy(self.__be, self.__hv, self.__psi)
 
     def get_transmission(self):
-        return transmission(self.__ke, self.__pe, self.__a, self.__scale)
+        ke = self.get_kinetic_energy()
+
+        return transmission(ke, self.__pe, self.__a, self.__scale)
 
     def get_sf_machine(self):
         ke = self.get_kinetic_energy()
         transmission_wagner = 1/ke # proportional to 1/KE
-        if 'transmission_wagner' in kws:
-            self.transmission_wagner = kws['transmission_wagner']
+        if 'transmission_wagner' in self.__kws:
+            self.transmission_wagner = self.__kws['transmission_wagner']
 
         tx_xps = self.get_transmission()
 
@@ -140,8 +146,6 @@ class XPSPeak():
                              self.__matrix_beta)
 
     def get_peak_correction(self):
-        ke = self.get_kinetic_energy()
-        tx = self.get_transmission()
         sf_mach = self.get_sf_machine()
 
         return peak_correction(self.__peak_area, sf_mach)
@@ -156,27 +160,24 @@ class XPSPeak():
 
         return params
 
-    def get_all(self, array_true=False):
+    def get_data_frame(self, return_dict=False):
         data_dict = {
-            'binding_energy'    : self.__be,
-            'kinetic_energy'    : self.get_kinetic_energy(),
-            'transmission_func' : self.get_transmission(),
-            'sf_machine'        : self.get_sf_machine(),
-            'matrix_factor'     : self.get_matrix_factor(),
-            'peak_corrected'    : self.get_peak_correction(),
+            'peak_id'           : [self.__peak_id],
+            'binding_energy'    : [self.__be],
+            'kinetic_energy'    : [self.get_kinetic_energy()],
+            'transmission_func' : [self.get_transmission()],
+            'sf_element'        : [self.__sf_elem],
+            'sf_machine'        : [self.get_sf_machine()],
+            'matrix_factor'     : [self.get_matrix_factor()],
+            'peak'              : [self.__peak_area],
+            'peak_corrected'    : [self.get_peak_correction()],
         }
 
-        if array_true == True:
-            header = []
-            values = []
-            for k, v in data_dict.iter():
-                header.append(k)
-                values.append(v)
-            format = ['f8' for i in range(len(values))]
-            data_arr = np.rec.fromrecords(values, header, format)
+        if return_dict == True:
+            return data_dict
 
-            return data_arr
-        return data_dict
+        return DataFrame(data=data_dict)
+
 
 
 if __name__ == '__main__':
