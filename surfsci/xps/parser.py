@@ -40,5 +40,7 @@ class CasaXPS:
         return self.peak_param.loc['FWHM'][peak_id]
 
     def area(self, peak_id):
+        if type(peak_id) == list:
+            return sum([self.peak_param.loc['Area'][pk] for pk in peak_id])
         return self.peak_param.loc['Area'][peak_id]
 

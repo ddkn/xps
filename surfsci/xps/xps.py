@@ -29,13 +29,14 @@ from pandas import DataFrame
 
 photon_energy = {
     'Mg' : 1253.6, # eV
+    'Al' : 1486.6, # eV
 }
 
 mach_param = {
     'Dalhousie': {
-        'coef' : [0.9033, -4.0724, 5.0677, 1.1066],
-        'scale'        : 0.01,
-        'work_func'    : 4.6,
+        'coef'      : [0.9033, -4.0724, 5.0677, 1.1066],
+        'scale'     : 0.01,
+        'work_func' : 4.6,
     }
 }
 
@@ -59,13 +60,13 @@ def transmission(ke, pe, a, scale):
             See documentation on numpy.poly1d
     scale : required scaling factor according to Avantage software
     """
-    poly = poly1d(a)
+    f = poly1d(a)
     x = log10(ke/pe)
-    y = poly(x)
+    y = f(x)
     return scale*pe*10**y
 
 
-def sf_machine(sf_wagner, transmission_xps, transmission_wagner):
+def sf_machine(sf_wagner, transmission_mach, transmission_wagner):
     """Sensitivity factor for XPS machine correction from the Wagner XPS machine
 
     sf_wagner              : Wagner sensitivity factor
@@ -74,7 +75,7 @@ def sf_machine(sf_wagner, transmission_xps, transmission_wagner):
                              element.
                              Proportional to 1/(kinetic_energy) [1/eV]
     """
-    return sf_wagner*transmission_xps/transmission_wagner
+    return sf_wagner*transmission_mach/transmission_wagner
 
 
 def peak_correction(peak_area, sf_machine):
@@ -87,39 +88,48 @@ def peak_correction(peak_area, sf_machine):
     return peak_area/sf_machine
 
 
-def matrix_factor(alpha, beta, matrix_alpha, matrix_beta):
+def matrix_factor(mfp_a, mfp_b, mfp_matrix_a, mfp_matrix_b, rho_a, rho_b):
     """Determines the matrix multiplicity factor. Mean free path values can be
 found using an external program QUASES-IMFP-TPP2M.
 
-    alpha            : Mean free path of alpha, eg. \lambda(KE_{Mn 2p3/2})
-    beta             : Mean free path of beta, eg. \lambda(KE_{Co 2p3/2})
-    matrix_alpha     : Mean free path of matrix with kinetic energy of alpha
-                       \lambda_matirx(KE_{Mn 2p3/2})
-    matrix_beta      : Mean free path of matrix with kinetic energy of beta
-                       \lambda_matirx(KE_{Co 2p3/2})
+    mfp_a        : Mean free path (mfp) of a in bulk, eg. mfp_a(KE_{Mn 2p3/2})
+    mfp_b        : Mean free path (mfp) of b in bulk, eg. mfp_b(KE_{Co 2p3/2})
+    mfp_matrix_a : Mean free path of matrix with kinetic energy of a
+                   mfp_matirx(KE_{Mn 2p3/2})
+    mfp_matrix_b : Mean free path of matrix with kinetic energy of b
+                   mfp_matirx(KE_{Co 2p3/2})
+    rho_a        : Density of species a
+    rho_b        : Density of species b
     """
-    return (matrix_alpha*beta)/(matrix_beta*alpha)
+    a = mfp_matrix_a/mfp_a/rho_a
+    b = mfp_matrix_b/mfp_b/rho_b
+    return a/b
 
 
 class XPSPeak():
     """XPSPeakBase class that conveniently wraps the base functions into an object
+    peak_id    : Peak ID label
+    be         : Binding energy [eV]
+    peak_area  : Area of peak [CPS*eV]
+    sf_wag     : Wagner sensitivity factor
+    hv         : Photon energy
+    pe         : Pass energy
+    mach_param : Dictionary of XPS machine parameters:
+                 coef      : [aN, aN-1, ..., a1, a0]
+                 work_func : float [eV]
+                 scale     : float
     """
-    def __init__(self, peak_id, be, peak_area, sf_elem, hv, pe, a, work_func,
-            scale, alpha=1, beta=1, matrix_alpha=1, matrix_beta=1,
+    def __init__(self, peak_id, be, peak_area, sf_wagner, hv, pe, mach_param,
             *args, **kws):
         self.__peak_id = peak_id
         self.__be = be
         self.__peak_area = peak_area
-        self.__sf_elem = sf_elem
+        self.__sf_wagner = sf_wagner
         self.__hv = hv
         self.__pe = pe
-        self.__a = a
-        self.__psi = work_func
-        self.__scale = scale
-        self.__alpha = alpha
-        self.__beta = beta
-        self.__matrix_alpha = matrix_alpha
-        self.__matrix_beta = matrix_beta
+        self.__a = mach_param['coef']
+        self.__psi = mach_param['work_func']
+        self.__scale = mach_param['scale']
         self.__args = args
         self.__kws = kws
 
@@ -128,7 +138,6 @@ class XPSPeak():
 
     def get_transmission(self):
         ke = self.get_kinetic_energy()
-
         return transmission(ke, self.__pe, self.__a, self.__scale)
 
     def get_sf_machine(self):
@@ -138,16 +147,10 @@ class XPSPeak():
             self.transmission_wagner = self.__kws['transmission_wagner']
 
         tx_xps = self.get_transmission()
-
-        return sf_machine(self.__sf_elem, tx_xps, transmission_wagner)
-
-    def get_matrix_factor(self):
-        return matrix_factor(self.__alpha, self.__beta, self.__matrix_alpha,
-                             self.__matrix_beta)
+        return sf_machine(self.__sf_wagner, tx_xps, transmission_wagner)
 
     def get_peak_correction(self):
         sf_mach = self.get_sf_machine()
-
         return peak_correction(self.__peak_area, sf_mach)
 
     def get_mach_params(self):
@@ -156,28 +159,37 @@ class XPSPeak():
             'pass_energy'   : self.__pe,
             'coefficients'  : self.__a,
             'scale'         : self.__scale,
+            'work_func'     : self.__psi,
         }
-
         return params
 
-    def get_data_frame(self, return_dict=False):
+    def set_matrix_component(self, mfp, mfp_matrix, rho):
+        """
+    mfp        : Mean free path (mfp) in bulk, eg. mfp_a(KE_{Mn 2p3/2})
+    mfp_matrix : Mean free path of matrix with kinetic energy of a
+                   mfp_matirx(KE_{Mn 2p3/2})
+    rho        : Density of material
+        """
+        self.__matrix_component = mfp_matrix/mfp/rho
+
+    def df(self, return_dict=False):
         data_dict = {
             'peak_id'           : [self.__peak_id],
             'binding_energy'    : [self.__be],
             'kinetic_energy'    : [self.get_kinetic_energy()],
             'transmission_func' : [self.get_transmission()],
-            'sf_element'        : [self.__sf_elem],
+            'sf_wagner'         : [self.__sf_wagner],
             'sf_machine'        : [self.get_sf_machine()],
-            'matrix_factor'     : [self.get_matrix_factor()],
             'peak'              : [self.__peak_area],
             'peak_corrected'    : [self.get_peak_correction()],
         }
 
+        if hasattr(self, '_XPSPeak__matrix_component'):
+            data_dict['matrix_component'] = [self.__matrix_component]
+
         if return_dict == True:
             return data_dict
-
         return DataFrame(data=data_dict)
-
 
 
 if __name__ == '__main__':
