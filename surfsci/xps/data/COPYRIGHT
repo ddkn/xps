@@ -1,0 +1,26 @@
+The surfsci/xps/db/sfwagner.db contains Wagner sensitivity factors from
+
+"Practical Surface Analysis by Auger and X-ray Photoelectron Spectroscopy",
+D. Briggs and M. P. Seah,
+Appendix 5, p511-514,
+Published by J. Wiley and Sons in 1983, ISBN 0-471-26279
+
+Appendix 5: Empirically derived set of atomic sensitivity factors for XPS
+
+Copyright (c) 1983 by John Wiley & Sons Ltd.
+
+The data in Appendix 5 is reproduced and provided here for non-profit use with
+permission of the publisher John Wiley & Sons Ltd.
+
+For non-profit use as framework system calls or as a reference.
+This permission does not include the right to grant others permission to
+photocopy or otherwise reproduce this material except for accessible versions
+made by non-profit organizations serving the blind, visually impaired and other
+persons with print disabilities (VIPs).
+
+The original set of data first appeared in the following resource:
+C. D. Wagner, L. E. Davis, M. V. Zeller, J. A. Taylor, R. M. Raymond and L. H. Gale,
+Surf. Interface Anal., 3. 211 (1981)
+
+Any use of this data must include the citations above in any work.
+
