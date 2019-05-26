@@ -24,23 +24,42 @@ __status__  = 'Development'
 from pandas import read_csv
 
 class CasaXPS:
-    def __init__(self, filename, data_start=7, header_start=2, header_len=3):
-        self.raw_data = read_csv(filename, skiprows=data_start, delimiter='\t')
+    '''CasaXPS class is a parser for an individual file output from CasaXPS
+    '''
+    def __init__(self, filename, delimiter=',', data_start=7, header_start=2, 
+            header_len=4, *args, **kws):
+        self.peak_data = read_csv(filename, skiprows=data_start, 
+                                 delimiter=delimiter)
 
-        hdr = read_csv(filename, skiprows=header_start, 
-                       nrows=header_len, delimiter='\t', index_col=0)
+        with open(filename, 'r') as f:
+            ln = f.readline()
+            cyc, scan, elem = ln.strip().strip('"').split(':')
+            ln = f.readline()
+            _, char_energy, _, acq_time = ln.strip().split(delimiter)
+            self.cycle = cyc
+            self.scan_type = {scan:elem}
+            self.characteristic_energy = float(char_energy)
+            self.acq_time = float(acq_time)
+        hdr = read_csv(filename, skiprows=header_start, index_col=0,
+                       nrows=header_len, delimiter=delimiter)
         col_names = [col for col in hdr if 'unnamed' not in col.lower()]
         self.peak_param = hdr[col_names]
+        self.peak_param = self.peak_param.transpose()
+        for k in self.peak_param.keys():
+            if k in ['Lineshape', 'Name']:
+                self.peak_param[k] = self.peak_param[k].astype(str)
+                continue
+            self.peak_param[k] = self.peak_param[k].astype('float64')
         self.peak_ids = col_names
 
     def binding_energy(self, peak_id):
-        return self.peak_param.loc['Position'][peak_id]
+        return self.peak_param.loc[peak_id]['Position']
         
     def fwhm(self, peak_id):
-        return self.peak_param.loc['FWHM'][peak_id]
+        return self.peak_param.loc[peak_id]['FWHM']
 
     def area(self, peak_id):
         if type(peak_id) == list:
-            return sum([self.peak_param.loc['Area'][pk] for pk in peak_id])
-        return self.peak_param.loc['Area'][peak_id]
+            return sum([self.peak_param.loc[pk]['Area'] for pk in peak_id])
+        return self.peak_param.loc[peak_id]['Area']
 
