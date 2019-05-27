@@ -24,8 +24,9 @@ __author__  = 'David Kalliecharan'
 __license__ = 'ISC License'
 __status__  = 'Development'
 
-from numpy import log10, poly1d
-from pandas import DataFrame
+from numpy import log10 as _log10
+from numpy import poly1d as _poly1d
+from pandas import DataFrame as _DataFrame
 
 photon_energy = {
     'Mg' : 1253.6, # eV
@@ -60,8 +61,8 @@ def transmission(ke, pe, a, scale):
             See documentation on numpy.poly1d
     scale : required scaling factor according to Avantage software
     """
-    f = poly1d(a)
-    x = log10(ke/pe)
+    f = _poly1d(a)
+    x = _log10(ke/pe)
     y = f(x)
     return scale*pe*10**y
 
@@ -189,7 +190,7 @@ class XPSPeak():
 
         if return_dict == True:
             return data_dict
-        return DataFrame(data=data_dict)
+        return _DataFrame(data=data_dict)
 
 
 if __name__ == '__main__':
