@@ -1,6 +1,7 @@
 # surfsci
 
-A suite of tools for handling surface science related data. This project will contain tools for the following:
+A suite of tools for handling surface science related data. This project will
+contain tools for the following:
 
 * X-ray photoelectron spectroscopy (XPS)
 
@@ -57,7 +58,12 @@ An example analyzing a Ge peak fit within CasaXPS.
 ### Matrix Factor corrections
 
 If using multple elements within a matrix (e.g. an alloy), you can utilize the
-`surfsci.xps.matrix_factor` function. You require the inelastic mean free path of electron scattering (*imfp*) of both species in bulk and the density, as well as the *imfp* of the matrix at the measured kinetic energies of both elements. For example, if you have two corrected peaks: `pk_Mn_corr`, and `pk_Ge_corr`. The *imfp* can be calculated using the TPP-2M equation for inelastic mean free path, found in the following reference:
+`surfsci.xps.matrix_factor` function. You require the inelastic mean free path
+of electron scattering (*imfp*) of both species in bulk and the density, as
+well as the *imfp* of the matrix at the measured kinetic energies of both
+elements. For example, if you have two corrected peaks: `pk_Mn_corr`, and
+`pk_Ge_corr`. The *imfp* can be calculated using the TPP-2M equation for
+inelastic mean free path, found in the following reference:
 
 S. Tanuma, C. J. Powel, D. R. Penn, *Surf. Interf. Anal.*, Vol 21, 165 (1994)
 
@@ -105,3 +111,29 @@ Surf. Interface Anal., 3. 211 (1981)
 
 Any use of this data must include the citations above in any work.
 
+## Electron Inelastic Mean Free Path (IMFP)
+Electron IMFP can be calculated from using the Tanuma, Powel, Penn modified
+(TPP-2M) equation derived from equations (3), (4b,c,d,e) and (8) in the
+following reference:
+
+S. Tanuma, C. J. Powel, D. R. Penn, *Surf. Interf. Anal.*, Vol 21, 165 (1994)
+
+For convienence the IMFP TPP-2M equation is located in `surfsci.scatter` and
+can be used as such:
+
+	from surfsci import scatter
+
+	# Mn example
+	kinetic_energy = 1000 # Can be calculated from surfsci.xps.kinetic_energy
+
+	rho = 7.43         # [g/cc]
+	Nv = 7             # valence electrons
+	M = 53.938         # atomic mass
+	bandgap_energy = 0 # [eV]
+
+	# Return SI units [m]
+	imfp_Mn = scatter.imfp_TPP2M(kinetic_energy, rho, M, Nv,
+								 bandgap_energy, 'SI')
+
+The value here can be used in the `surfsci.xps.matrix_factor` calculations
+outlined above.
