@@ -27,32 +27,35 @@ IMFP TPP-2M (TPP-2 modified eqution)
 from numpy import log as _log
 from numpy import sqrt as _sqrt
 
-def imfp_TPP2M(Ek, rho, M, Nv, Eg, units='Angstroms'):
+def imfp_TPP2M(energy_k, rho, molar_mass, n_valence, energy_bg,
+        units='angstroms'):
     """The TPP-2M is the modified TPP-2 equation for estimating inelastic
     mean free paths (IMFP)
 
     S. Tanuma, C. J. Powell, D. R. Penn: Surf. Interf. Anal.,Vol. 21, 165 (1994)
 
-    Ek    : Kinetic energy [eV]
-    rho   : Density (g/cm**3)
-    M     : Atomic or molar mass
-    Nv    : Valence electrons
-    Eg    : Bandgap energy [eV]
-    units : 'Angstroms' or 'SI' [default: AA, or 1E-10 m]
+    energy_k   : Kinetic energy [eV]
+    rho        : Density (g/cm**3)
+    molar_mass : Atomic or molar mass
+    n_valence  : Valence electrons
+    energy_bg  : Bandgap energy [eV]
+    units      : 'angstroms' or 'si' [default: AA, or 1E-10 m]
 
     returns IMFP in Angstroms or meters [default: AA, or 1E-10 m]
     """
-    # NOTE gamma, betaM, U, C, D are fitting parameters as in ref.
-    U = Nv*rho/M
-    C = 1.97 - 0.91*U
-    D = 53.4 - 20.8*U
-    Eplasmon = _sqrt(829.4*U)
+    # NOTE gamma, betaM, u, c, d are fitting parameters as in ref.
+    u = n_valence*rho/molar_mass
+    c = 1.97 - 0.91*u
+    d = 53.4 - 20.8*u
+
+    energy_plasmon = _sqrt(829.4*u)
+
     gamma = 0.191*rho**-0.50
-    betaM = -0.10 + 0.944/_sqrt(Eplasmon**2 + Eg**2) + 0.069*rho**0.1
+    betaM = -0.10 + 0.944/_sqrt(energy_plasmon**2 + energy_bg**2) + 0.069*rho**0.1
 
-    imfp = Ek/(Eplasmon**2*(betaM*_log(gamma*Ek) - C/Ek+ D/Ek**2))
+    imfp = energy_k/(energy_plasmon**2*(betaM*_log(gamma*energy_k) - c/energy_k+ d/energy_k**2))
 
-    if units.upper() == 'SI':
+    if units.lower() == 'si':
         # Convert to meters
         return imfp*1E-10
     # Leave units unmodified in Angstroms
