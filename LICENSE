@@ -19,10 +19,10 @@ Name: Data for Empirical Wagner Sensitivity Factors
 Files: xps/data/sfwagner.db
 License: Copyright (c) 1983 by John Wiley & Sons Ltd.
 Permission:
-  For non-profit use as framework system calls or as a reference.
-  This permission does not include the right to grant others permission to
-  photocopy or otherwise reproduce this material except for accessible
-  versions made by non-profit organizations serving the blind, visually
-  impaired and other persons with print disabilities (VIPs).
+    For non-profit use as framework system calls or as a reference.
+    This permission does not include the right to grant others permission to
+    photocopy or otherwise reproduce this material except for accessible
+    versions made by non-profit organizations serving the blind, visually
+    impaired and other persons with print disabilities (VIPs).
 
-  For usage details, see xps/data/COPYRIGHT
+    For usage details, see xps/data/COPYRIGHT
