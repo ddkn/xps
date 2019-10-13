@@ -12,17 +12,17 @@ WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-surfsci is bundled with data and files that are compatibility licensed. See
+"xps" is bundled with data and files that are compatibility licensed. See
 below for the list of copyrights and licenses:
 
 Name: Data for Empirical Wagner Sensitivity Factors
-Files: surfsci/xps/db/sfwagner.db
+Files: xps/data/sfwagner.db
 License: Copyright (c) 1983 by John Wiley & Sons Ltd.
 Permission:
-	For non-profit use as framework system calls or as a reference.
-	This permission does not include the right to grant others permission to
-	photocopy or otherwise reproduce this material except for accessible
-	versions made by non-profit organizations serving the blind, visually
-	impaired and other persons with print disabilities (VIPs).
+  For non-profit use as framework system calls or as a reference.
+  This permission does not include the right to grant others permission to
+  photocopy or otherwise reproduce this material except for accessible
+  versions made by non-profit organizations serving the blind, visually
+  impaired and other persons with print disabilities (VIPs).
 
-	For usage details, see surfsci/xps/db/COPYRIGHT
+  For usage details, see xps/data/COPYRIGHT

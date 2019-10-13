@@ -19,7 +19,7 @@ sfwagner.py
 X-Ray photoelectron spectroscopy (XPS) Wagner sensitivity factors (sf), this
 is required for any corrections on any XPS machine.
 
-The surfsci/xps/db/sfwagner.db contains Wagner sensitivity factors from
+The xps/data/sfwagner.db contains Wagner sensitivity factors from
 
 "Practical Surface Analysis by Auger and X-ray Photoelectron Spectroscopy",
 D. Briggs and M. P. Seah,
@@ -53,11 +53,6 @@ DATAPATH = _path.join(ROOTPATH, 'data')
 
 SFWAGNER_DB = _path.join(DATAPATH, 'sfwagner.db')
 
-class Shell():
-    def __init__(self, elem):
-        self.element = elem
-        pass
-
 class SensitivityFactors():
     def __init__(self):
         conn = _sqlite3.connect(SFWAGNER_DB)
@@ -69,14 +64,14 @@ class SensitivityFactors():
             shell = [row[0] for row in cur.execute(query.format(elem=e))]
             shell_dict = {}
             for s in shell:
-                shell_dict[s] = Shell(e)
+                shell_dict[s] = dict()
                 query = 'SELECT area, height FROM wagner WHERE element=="{elem}" AND shell=="{sh}"'
                 res = cur.execute(query.format(elem=e, sh=s))
                 area, height = res.fetchone()
                 if area is not None:
-                    setattr(shell_dict[s], 'area', area)
+                    shell_dict[s]['area'] = area
                 if height is not None:
-                    setattr(shell_dict[s], 'height', height)
+                    shell_dict[s]['height'] = height
             setattr(self, e, shell_dict)
 
 

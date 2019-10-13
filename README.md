@@ -1,13 +1,9 @@
-# surfsci
-
-A suite of tools for handling surface science related data. This project will
-contain tools for the following:
-
-* X-ray photoelectron spectroscopy (XPS)
+# X-ray photoelectron spectroscopy (XPS)
 
 ## Future
 
 * Docmuentation (priority)
+* Add database of inelastic mean free path (IMFP) of common materials
 
 ## X-ray Photonelectron Spectroscopy
 
@@ -15,7 +11,7 @@ contain tools for the following:
 
 An example analyzing a Ge peak fit within CasaXPS.
 
-	from surfsci import xps
+	import xps
 
 	# Shortcut for the XPS machine at Dalhousie
 	# xps_mach = 'Dalhousie'
@@ -30,7 +26,7 @@ An example analyzing a Ge peak fit within CasaXPS.
 	# Pass energy [eV], found from XPS operator
 	pe = 30
 
-	sfwagner_Ge = xps.sf.Ge['3d'].area
+	sfwagner_Ge = xps.sf.Ge['3d']['area']
 
 	data = xps.parser.CasaXPS('Ge_example.csv')
 
@@ -48,7 +44,7 @@ An example analyzing a Ge peak fit within CasaXPS.
 
 	pk_corr = xps.peak_correction(area, sf_mach)
 
-	# NOTE Use the surfsci.xps.XPSPeak(...) helper for convienence
+	# NOTE Use the xps.XPSPeak(...) helper for convienence
 	# analyzed_Ge = xps.XPSPeak(pk_lbl, be, area, sfwagner_Ge, hv, pe, mach)
 
 	# NOTE Returns pandas.DataFrame with all parameters calculated.
@@ -58,7 +54,7 @@ An example analyzing a Ge peak fit within CasaXPS.
 ### Matrix Factor corrections
 
 If using multple elements within a matrix (e.g. an alloy), you can utilize the
-`surfsci.xps.matrix_factor` function. You require the inelastic mean free path
+`xps.matrix_factor` function. You require the inelastic mean free path
 of electron scattering (*imfp*) of both species in bulk and the density, as
 well as the *imfp* of the matrix at the measured kinetic energies of both
 elements. For example, if you have two corrected peaks: `pk_Mn_corr`, and
@@ -68,7 +64,7 @@ inelastic mean free path, found in the following reference:
 S. Tanuma, C. J. Powel, D. R. Penn, *Surf. Interf. Anal.*, Vol 21, 165 (1994)
 
 
-	from surfsci import xps
+	import xps
 	# pk_Mn_corr and pk_Ge_corr calculated as in the example above
 
 	# a is the kinetic energy used to determine imfp of Ge in Bulk
@@ -82,8 +78,8 @@ S. Tanuma, C. J. Powel, D. R. Penn, *Surf. Interf. Anal.*, Vol 21, 165 (1994)
 	rho_Mn_b = 7.43
 
 	mat_fact = xps.matrix_factor(imfp_Ge_a, imfp_Mn_b,
-								 mfp_matrix_a, mfp_matrix_b,
-								 rho_Ge_a, rho_Mn_b)
+		mfp_matrix_a, mfp_matrix_b,
+		rho_Ge_a, rho_Mn_b)
 	relative_pk_Ge_corr = (pk_Ge_corr/pk_Mn_corr)*mat_fact
 
 	# NOTE because Mn is used as the normalizing component we can use its
@@ -118,13 +114,13 @@ following reference:
 
 S. Tanuma, C. J. Powel, D. R. Penn, *Surf. Interf. Anal.*, Vol 21, 165 (1994)
 
-For convienence the IMFP TPP-2M equation is located in `surfsci.scatter` and
+For convienence the IMFP TPP-2M equation is located in `xps.scatter` and
 can be used as such:
 
-	from surfsci import scatter
+	from xps import scatter
 
 	# Mn example
-	kinetic_energy = 1000 # Can be calculated from surfsci.xps.kinetic_energy
+	kinetic_energy = 1000 # Can be calculated from xps.kinetic_energy
 
 	rho = 7.43         # [g/cc]
 	Nv = 7             # valence electrons
@@ -133,7 +129,7 @@ can be used as such:
 
 	# Return SI units [m]
 	imfp_Mn = scatter.imfp_TPP2M(kinetic_energy, rho, M, Nv,
-								 bandgap_energy, 'SI')
+		bandgap_energy, 'SI')
 
-The value here can be used in the `surfsci.xps.matrix_factor` calculations
+The value here can be used in the `xps.matrix_factor` calculations
 outlined above.

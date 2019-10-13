@@ -4,14 +4,14 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="surfsci",
-    version="0.1.7",
-    description="A suite of tools for handling surface science related data",
+    name="xps",
+    version="0.2",
+    description="X-Ray photonelectron spectroscopy (XPS) analysis tools",
     long_description=long_description,
     long_description_content_type="text/markdown",
     author="David Kalliecharan",
     author_email="david@david.science",
-    url="https://gitlab.com/ddkn/surfsci",
+    url="https://gitlab.com/ddkn/xps",
     packages=setuptools.find_packages(),
     include_package_data=True,
     license='ISC',
