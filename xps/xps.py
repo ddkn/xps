@@ -28,12 +28,12 @@ from numpy import log10 as _log10
 from numpy import poly1d as _poly1d
 from pandas import DataFrame as _DataFrame
 
-photon_energy = {
+PHOTON_ENERGY = {
     'Mg' : 1253.6, # eV
     'Al' : 1486.6, # eV
 }
 
-mach_param = {
+MACH_PARAM = {
     'Dalhousie': {
         'coef'      : [0.9033, -4.0724, 5.0677, 1.1066],
         'scale'     : 0.01,
@@ -79,14 +79,14 @@ def sf_machine(sf_wagner, transmission_mach, transmission_wagner):
     return sf_wagner*transmission_mach/transmission_wagner
 
 
-def peak_correction(peak_area, sf_machine):
+def peak_correction(peak_area, sf_mach):
     """Corrected intensity of peak fitting by scaling to the sensitivity
     factor of the machine.
 
     peak_area   : peak area [CPS*eV]
-    sf_machine  : sensitivity factor of xps machine
+    sf_mach     : sensitivity factor of xps machine
     """
-    return peak_area/sf_machine
+    return peak_area/sf_mach
 
 
 def matrix_factor(mfp_a, mfp_b, mfp_matrix_a, mfp_matrix_b, rho_a, rho_b):
@@ -135,13 +135,16 @@ class XPSPeak():
         self.__kws = kws
 
     def get_kinetic_energy(self):
+        """Get kinetic energy at a binding energy, see xps.kinetic_energy"""
         return kinetic_energy(self.__be, self.__hv, self.__psi)
 
     def get_transmission(self):
+        """Get transmission function, see xps.transmission"""
         ke = self.get_kinetic_energy()
         return transmission(ke, self.__pe, self.__a, self.__scale)
 
     def get_sf_machine(self):
+        """Get sensitivity factor of machine, see xps.sf_machine"""
         ke = self.get_kinetic_energy()
         transmission_wagner = 1/ke # proportional to 1/KE
         if 'transmission_wagner' in self.__kws:
@@ -151,10 +154,12 @@ class XPSPeak():
         return sf_machine(self.__sf_wagner, tx_xps, transmission_wagner)
 
     def get_peak_correction(self):
+        """Get peak corrections, see xps.peak_correction"""
         sf_mach = self.get_sf_machine()
         return peak_correction(self.__peak_area, sf_mach)
 
     def get_mach_params(self):
+        """Get machine paramters"""
         params = {
             'photon_energy' : self.__hv,
             'pass_energy'   : self.__pe,
@@ -173,7 +178,7 @@ class XPSPeak():
         """
         self.__matrix_component = mfp_matrix/mfp/rho
 
-    def df(self, return_dict=False):
+    def get_data(self, return_dict=False):
         data_dict = {
             'peak_id'           : [self.__peak_id],
             'binding_energy'    : [self.__be],
