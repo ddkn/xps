@@ -15,35 +15,36 @@
 # CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 """
 sfwagner.py
+-----------
 
 X-Ray photoelectron spectroscopy (XPS) Wagner sensitivity factors (sf), this
 is required for any corrections on any XPS machine.
 
-The xps/data/sfwagner.db contains Wagner sensitivity factors from
+The xps/data/sfwagner.db contains data for the Wagner sensitivity factors and
+is reproduced and provided here for non-profit use with permission of the
+publisher John Wiley & Sons Ltd. [1]
 
-"Practical Surface Analysis by Auger and X-ray Photoelectron Spectroscopy",
-D. Briggs and M. P. Seah,
-Appendix 5, p511-514,
-Published by J. Wiley and Sons in 1983, ISBN 0-471-26279
-
-Appendix 5: Empirically derived set of atomic sensitivity factors for XPS
-
+*Appendix 5: Empirically derived set of atomic sensitivity factors for XPS*,
+p511-514, Published by J. Wiley and Sons in 1983, ISBN 0-471-26279,
 Copyright (c) 1983 by John Wiley & Sons Ltd.
 
-The data in Appendix 5 is reproduced and provided here for non-profit use with
-permission of the publisher John Wiley & Sons Ltd.
-
-For non-profit use as framework system calls or as a reference.
-This permission does not include the right to grant others permission to
-photocopy or otherwise reproduce this material except for accessible versions
-made by non-profit organizations serving the blind, visually impaired and other
+For non-profit use as a framework of system calls or as a reference. This
+permission does not include the right to grant others permission to photocopy
+or otherwise reproduce this material except for accessible versions made by
+non-profit organizations serving the blind, visually impaired and other
 persons with print disabilities (VIPs).
 
 The original set of data first appeared in the following resource:
 C. D. Wagner, L. E. Davis, M. V. Zeller, J. A. Taylor, R. M. Raymond and L. H. Gale,
 Surf. Interface Anal., 3. 211 (1981)
 
-Any use of this data must include the citations above in any work.
+Any use of this data must include the citation above and below in any work.
+
+References
+..........
+
+.. [1] "Practical Surface Analysis by Auger and X-ray Photoelectron Spectroscopy",
+    D. Briggs and M. P. Seah,
 """
 import os.path as _path
 import sqlite3 as _sqlite3
@@ -54,6 +55,9 @@ DATAPATH = _path.join(ROOTPATH, 'data')
 SFWAGNER_DB = _path.join(DATAPATH, 'sfwagner.db')
 
 class SensitivityFactors():
+    """Generates object of elements with orbitals and sensitivity factors for
+    area and height.
+    """
     def __init__(self):
         conn = _sqlite3.connect(SFWAGNER_DB)
         cur = conn.cursor()

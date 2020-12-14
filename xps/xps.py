@@ -15,6 +15,7 @@
 # CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 """
 xps.py
+------
 
 X-Ray photoelectron spectroscopy (XPS) helper functions to adjust the
 machine dependent intensities to Wagner intensities

@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="xps",
-    version="0.2",
+    version="0.2.1",
     description="X-Ray photonelectron spectroscopy (XPS) analysis tools",
     long_description=long_description,
     long_description_content_type="text/markdown",

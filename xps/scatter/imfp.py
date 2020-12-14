@@ -15,12 +15,13 @@
 # CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 """
 imfp.py
+-------
 
-Equations relating to the Inelastic Mean Free Path (IMFP) of electrons
+Equations relating to the Inelastic Mean Free Path (IMFP) of electrons [1]
 
 References
-----------
-IMFP TPP-2M (TPP-2 modified eqution)
+..........
+.. [1] IMFP TPP-2M (TPP-2 modified eqution)
     S. Tanuma, C. J. Powell, D. R. Penn: Surf. Interf. Anal.,Vol. 21, 165 (1994)
 """
 
@@ -30,18 +31,31 @@ from numpy import sqrt as _sqrt
 def imfp_TPP2M(energy_k, rho, molar_mass, n_valence, energy_bg,
         units='angstroms'):
     """The TPP-2M is the modified TPP-2 equation for estimating inelastic
-    mean free paths (IMFP)
+    mean free paths (IMFP) [1]
 
-    S. Tanuma, C. J. Powell, D. R. Penn: Surf. Interf. Anal.,Vol. 21, 165 (1994)
+    Parameters
+    ----------
+    energy_k : float
+        Kinetic energy [eV]
+    rho : float
+        Density (g/cm**3)
+    molar_mass : float
+        Atomic or molar mass
+    n_valence : float
+        Valence electrons
+    energy_bg : float
+        Bandgap energy [eV]
+    units : str
+        'angstroms' or 'si' (the default is 'angstroms')
 
-    energy_k   : Kinetic energy [eV]
-    rho        : Density (g/cm**3)
-    molar_mass : Atomic or molar mass
-    n_valence  : Valence electrons
-    energy_bg  : Bandgap energy [eV]
-    units      : 'angstroms' or 'si' [default: AA, or 1E-10 m]
+    Returns
+    -------
+    float
+        Inelastic mean free path (IMFP)
 
-    returns IMFP in Angstroms or meters [default: AA, or 1E-10 m]
+    References
+    --------
+    .. [1] S. Tanuma, C. J. Powell, D. R. Penn: Surf. Interf. Anal.,Vol. 21, 165 (1994)
     """
     # NOTE gamma, betaM, u, c, d are fitting parameters as in ref.
     u = n_valence*rho/molar_mass
@@ -51,9 +65,11 @@ def imfp_TPP2M(energy_k, rho, molar_mass, n_valence, energy_bg,
     energy_plasmon = _sqrt(829.4*u)
 
     gamma = 0.191*rho**-0.50
-    betaM = -0.10 + 0.944/_sqrt(energy_plasmon**2 + energy_bg**2) + 0.069*rho**0.1
+    betaM = -0.10 + 0.944/_sqrt(energy_plasmon**2 + energy_bg**2)
+    betaM += 0.069*rho**0.1
 
-    imfp = energy_k/(energy_plasmon**2*(betaM*_log(gamma*energy_k) - c/energy_k+ d/energy_k**2))
+    imfp = energy_k
+    imfp /= (energy_plasmon**2*(betaM*_log(gamma*energy_k) - c/energy_k+ d/energy_k**2))
 
     if units.lower() == 'si':
         # Convert to meters
