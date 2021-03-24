@@ -21,7 +21,7 @@ An example analyzing a Ge peak fit within CasaXPS.
         'scale'     : 0.01,
         'work_func' : 4.6,
     }
-    hv = xps.photon_energy['Al']
+    hv = xps.PHOTON_ENERGY['Al']
 
     # Pass energy [eV], found from XPS operator
     pe = 30
