@@ -46,20 +46,22 @@ References
 .. [1] "Practical Surface Analysis by Auger and X-ray Photoelectron Spectroscopy",
     D. Briggs and M. P. Seah,
 """
-import os.path as _path
-import sqlite3 as _sqlite3
 
-ROOTPATH = _path.dirname(_path.abspath(__file__))
-DATAPATH = _path.join(ROOTPATH, 'data')
+from pathlib import Path
+import sqlite3
 
-SFWAGNER_DB = _path.join(DATAPATH, 'sfwagner.db')
+ROOT_PATH = Path(__file__).parent
+DATA_PATH = ROOT_PATH / 'data'
+
+SFWAGNER_DB = DATA_PATH / 'sfwagner.db'
+
 
 class SensitivityFactors():
     """Generates object of elements with orbitals and sensitivity factors for
     area and height.
     """
     def __init__(self):
-        conn = _sqlite3.connect(SFWAGNER_DB)
+        conn = sqlite3.connect(SFWAGNER_DB)
         cur = conn.cursor()
         query = 'SELECT DISTINCT element FROM wagner'
         element = [row[0] for row in cur.execute(query)]
@@ -81,4 +83,3 @@ class SensitivityFactors():
 
 if __name__ == '__main__':
     pass
-

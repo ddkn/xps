@@ -17,18 +17,19 @@ parser.py
 Parser for XPS files generated from software
 """
 
+from io import StringIO
+from pandas import read_csv
+
 __author__  = 'David Kalliecharan'
 __license__ = 'ISC License'
 __status__  = 'Development'
 
-from io import StringIO as _StringIO
-from pandas import read_csv as _read_csv
 
 class CasaXPS:
     '''CasaXPS class is a parser for an individual file output from CasaXPS
     '''
     def __init__(self, filepath_or_buffer, delimiter=',', data_start=7,
-            header_start=2, header_len=4, *args, **kws):
+                 header_start=2, header_len=4, *args, **kws):
         try:
             with open(filepath_or_buffer, 'r') as f:
                 self.__parse_xps_param(f, delimiter)
@@ -36,12 +37,12 @@ class CasaXPS:
             self.__parse_xps_param(filepath_or_buffer, delimiter)
             filepath_or_buffer.seek(0)
 
-        self.peak_data = _read_csv(filepath_or_buffer, skiprows=data_start,
+        self.peak_data = read_csv(filepath_or_buffer, skiprows=data_start,
                                    delimiter=delimiter)
 
-        if type(filepath_or_buffer) is _StringIO:
+        if type(filepath_or_buffer) is StringIO:
             filepath_or_buffer.seek(0)
-        hdr = _read_csv(filepath_or_buffer, skiprows=header_start,
+        hdr = read_csv(filepath_or_buffer, skiprows=header_start,
                         index_col=0, nrows=header_len, delimiter=delimiter)
 
         col_names = [col for col in hdr if 'unnamed' not in col.lower()]
@@ -60,10 +61,10 @@ class CasaXPS:
         ln = buffer.readline()
         offset = 0
         if delimiter == ',':
-            offset +=1
+            offset += 1
         _, char_energy, _, acq_time = ln.strip().split(delimiter)[offset:]
         self.cycle = cyc
-        self.scan_type = {scan:elem}
+        self.scan_type = {scan : elem}
         self.characteristic_energy = float(char_energy)
         self.acq_time = float(acq_time)
         return
@@ -84,9 +85,8 @@ class CasaXPSColumn:
     '''CasaXPSColumn class reads column data into a list of CasaXPS objects.
     '''
     def __init__(self, filename, delimiter=',', data_start=7, header_start=2,
-            header_len=4, *args, **kws):
+                 header_len=4, *args, **kws):
         with open(filename, 'r') as f:
-            data = dict()
             lines = f.readlines()
             lineno = list()
             for i, ln in enumerate(lines):
@@ -95,11 +95,11 @@ class CasaXPSColumn:
             lineno.append(-1)
 
             self.scan = list()
-            for i in range(0, len(lineno)-1):
+            for i in range(0, len(lineno) - 1):
                 a = lineno[i]
-                b = lineno[i+1]
+                b = lineno[i + 1]
                 f = "".join(lines[a:b])
-                stream = _StringIO(f)
+                stream = StringIO(f)
                 casa = CasaXPS(stream, delimiter, data_start, header_start,
                                header_len, *args, **kws)
                 self.scan.append(casa)

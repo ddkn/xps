@@ -1,0 +1,23 @@
+[flake8]
+ignore = 
+    # Ignore leading whitespace for : (aligning code)
+    E203,
+    # Ignore leading whitespace for operator (aligning code)
+    E221,
+    # Ignore trailing whitespace for commas ',' (aligning code)
+    E241,
+    # Allow for longer lines over 83, some function names are long
+    E501,
+    # Allow for importing into space for user convenience
+    F401,
+    F403,
+    # Conform to new PEP8 math style line break with operators
+    W503,
+exclude =
+    # No need to traverse our git directory
+    .git,
+    # There's no value in checking cache directories
+    __pycache__,
+    # Do not check virtual environment venv
+    venv,
+max-complexity = 10

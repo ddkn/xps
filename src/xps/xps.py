@@ -21,17 +21,17 @@ X-Ray photoelectron spectroscopy (XPS) helper functions to adjust the
 machine dependent intensities to Wagner intensities
 """
 
+from numpy import log10
+from numpy import poly1d
+from pandas import DataFrame
+
 __author__  = 'David Kalliecharan'
 __license__ = 'ISC License'
 __status__  = 'Development'
 
-from numpy import log10 as _log10
-from numpy import poly1d as _poly1d
-from pandas import DataFrame as _DataFrame
-
 PHOTON_ENERGY = {
-    'Mg' : 1253.6, # eV
-    'Al' : 1486.6, # eV
+    'Mg' : 1253.6,  # eV
+    'Al' : 1486.6,  # eV
 }
 
 MACH_PARAM = {
@@ -41,6 +41,7 @@ MACH_PARAM = {
         'work_func' : 4.6,
     }
 }
+
 
 def kinetic_energy(be, hv, psi):
     """Calculates the kinetic energy (KE) with a Mg source (Dalhousie default):
@@ -58,14 +59,14 @@ def transmission(ke, pe, a, scale):
     ke    : Kinetic energy (KE [eV])
     pe    : Pass Energy (PE [eV])
     a     : List of coefficients for series expansion, _NOTE_ coefficents are
-            reversed such that (aN, ..., a0) -> aN*x**N + ... + a0
+            reversed such that (aN, ..., a0) -> aN * x ** N + ... + a0
             See documentation on numpy.poly1d
     scale : required scaling factor according to Avantage software
     """
-    f = _poly1d(a)
-    x = _log10(ke/pe)
+    f = poly1d(a)
+    x = log10(ke / pe)
     y = f(x)
-    return scale*pe*10**y
+    return scale * pe * 10 ** y
 
 
 def sf_machine(sf_wagner, transmission_mach, transmission_wagner):
@@ -77,7 +78,7 @@ def sf_machine(sf_wagner, transmission_mach, transmission_wagner):
                              element.
                              Proportional to 1/(kinetic_energy) [1/eV]
     """
-    return sf_wagner*transmission_mach/transmission_wagner
+    return sf_wagner * transmission_mach / transmission_wagner
 
 
 def peak_correction(peak_area, sf_mach):
@@ -87,7 +88,7 @@ def peak_correction(peak_area, sf_mach):
     peak_area   : peak area [CPS*eV]
     sf_mach     : sensitivity factor of xps machine
     """
-    return peak_area/sf_mach
+    return peak_area / sf_mach
 
 
 def matrix_factor(mfp_a, mfp_b, mfp_matrix_a, mfp_matrix_b, rho_a, rho_b):
@@ -103,16 +104,16 @@ found using an external program QUASES-IMFP-TPP2M.
     rho_a        : Density of species a
     rho_b        : Density of species b
     """
-    a = mfp_matrix_a/mfp_a/rho_a
-    b = mfp_matrix_b/mfp_b/rho_b
-    return a/b
+    a = mfp_matrix_a / mfp_a / rho_a
+    b = mfp_matrix_b / mfp_b / rho_b
+    return a / b
 
 
 class XPSPeak():
     """XPSPeakBase class that conveniently wraps the base functions into an object
     peak_id    : Peak ID label
     be         : Binding energy [eV]
-    peak_area  : Area of peak [CPS*eV]
+    peak_area  : Area of peak [CPS * eV]
     sf_wag     : Wagner sensitivity factor
     hv         : Photon energy
     pe         : Pass energy
@@ -122,7 +123,7 @@ class XPSPeak():
                  scale     : float
     """
     def __init__(self, peak_id, be, peak_area, sf_wagner, hv, pe, mach_param,
-            *args, **kws):
+                 *args, **kws):
         self.__peak_id = peak_id
         self.__be = be
         self.__peak_area = peak_area
@@ -147,7 +148,7 @@ class XPSPeak():
     def get_sf_machine(self):
         """Get sensitivity factor of machine, see xps.sf_machine"""
         ke = self.get_kinetic_energy()
-        transmission_wagner = 1/ke # proportional to 1/KE
+        transmission_wagner = 1 / ke  # proportional to 1/KE
         if 'transmission_wagner' in self.__kws:
             self.transmission_wagner = self.__kws['transmission_wagner']
 
@@ -177,7 +178,7 @@ class XPSPeak():
                    mfp_matirx(KE_{Mn 2p3/2})
     rho        : Density of material
         """
-        self.__matrix_component = mfp_matrix/mfp/rho
+        self.__matrix_component = mfp_matrix / mfp / rho
 
     def get_data(self, return_dict=False):
         data_dict = {
@@ -194,11 +195,10 @@ class XPSPeak():
         if hasattr(self, '_XPSPeak__matrix_component'):
             data_dict['matrix_component'] = [self.__matrix_component]
 
-        if return_dict == True:
+        if return_dict is True:
             return data_dict
-        return _DataFrame(data=data_dict)
+        return DataFrame(data=data_dict)
 
 
 if __name__ == '__main__':
     pass
-

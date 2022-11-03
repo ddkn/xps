@@ -1,5 +1,15 @@
 # Change Log
 
+## v0.2.2
+    * Switched to pathlib.Path
+    * Code cleanup via flake8
+    * Moved to hatch build system for python PEP >=3.10 compliance
+    * Cleaned up ambiguity in math
+
+## v0.2.1
+    * Added doc strings
+    * Made pythonic changes
+
 ## v0.2.0
 
 ### Changed
