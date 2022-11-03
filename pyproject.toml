@@ -1,0 +1,44 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "xps"
+dynamic = ["version"]
+description = "X-Ray photonelectron spectroscopy (XPS) analysis tools"
+readme = "README.md"
+authors = [
+    { name = "David Kalliecharan", email = "david@david.science" },
+]
+classifiers = [
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: ISC License (ISCL)",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Chemistry",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+requires-python = ">=3.7"
+dependencies = [
+    "numpy>=1.16.2",
+    "pandas",
+]
+
+[project.urls]
+Homepage = "https://gitlab.com/ddkn/xps"
+"Bug Tracker" = "https://gitlab.com/ddkn/xps/-/issues"
+
+[tool.hatch.version]
+path = "src/xps/__init__.py"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/xps",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = [
+    "src/xps",
+]

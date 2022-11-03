@@ -1,6 +1,7 @@
 __author__       = "David Kalliecharan"
 __author_email__ = "david@david.science"
 __license__      = "ISC"
+__version__      = "0.2.2"
 
 try:
     from .xps import *

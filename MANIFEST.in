@@ -1,5 +1,0 @@
-include LICENSE
-include README.md
-
-# Include data and databases
-graft xps/data
